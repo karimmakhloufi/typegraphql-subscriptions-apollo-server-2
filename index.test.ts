@@ -90,7 +90,7 @@ describe("post resolver", () => {
     expect(res.data?.posts).toEqual([{ content: "lala" }]);
   });
 
-  it("test real client", async () => {
+  it("subscription integration test", async () => {
     client
       .subscribe({
         query: gql`
@@ -110,7 +110,7 @@ describe("post resolver", () => {
         },
       });
 
-    await client.mutate({
+    client.mutate({
       mutation: gql`
         mutation CreatePost {
           addNewPost(newPostData: { content: "lala" }) {
