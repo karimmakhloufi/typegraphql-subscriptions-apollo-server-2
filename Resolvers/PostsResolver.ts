@@ -1,4 +1,13 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { PubSubEngine } from "graphql-subscriptions";
+import {
+  Arg,
+  Mutation,
+  PubSub,
+  Query,
+  Resolver,
+  Root,
+  Subscription,
+} from "type-graphql";
 import { Post } from "../Entities/Post";
 import { PostInput } from "../Inputs/PostInput";
 
@@ -12,8 +21,17 @@ export class PostResolver {
   }
 
   @Mutation(() => Post)
-  newPost(@Arg("newPostData") newPostData: PostInput) {
+  async addNewPost(
+    @Arg("newPostData") newPostData: PostInput,
+    @PubSub() pubSub: PubSubEngine
+  ) {
     posts.push(newPostData);
+    await pubSub.publish("NEW_POST", newPostData);
     return newPostData;
+  }
+
+  @Subscription({ topics: "NEW_POST" })
+  newPost(@Root() newPostPayload: Post): Post {
+    return newPostPayload;
   }
 }

@@ -5,7 +5,10 @@ import { PostResolver } from "./Resolvers/PostsResolver";
 
 const start = async () => {
   const schema = await buildSchema({ resolvers: [PostResolver] });
-  const server = new ApolloServer({ schema });
+  const server = new ApolloServer({
+    schema,
+    subscriptions: { path: "/subscriptions" },
+  });
 
   const { url } = await server.listen(4000);
   console.log(`Server is running, GraphQL Playground available at ${url}`);
