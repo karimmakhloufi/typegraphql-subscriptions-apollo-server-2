@@ -91,6 +91,7 @@ describe("post resolver", () => {
   });
 
   it("subscription integration test", async () => {
+    let dataFromSubscription = "";
     client
       .subscribe({
         query: gql`
@@ -103,21 +104,27 @@ describe("post resolver", () => {
       })
       .subscribe({
         next(data) {
-          expect(data.data.newPost.content).toBe("lala");
+          dataFromSubscription = data.data.newPost.content;
         },
         error(err) {
           console.log("error", err);
         },
       });
 
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     client.mutate({
       mutation: gql`
         mutation CreatePost {
-          addNewPost(newPostData: { content: "lala" }) {
+          addNewPost(newPostData: { content: "sub message" }) {
             content
           }
         }
       `,
     });
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    expect(dataFromSubscription).toBe("sub message");
   });
 });
